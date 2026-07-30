@@ -12,7 +12,7 @@ Decoding is not verification. A token that decodes cleanly is not a trusted one,
 
 ## Aesthetic
 
-A passport customs page: a navy cover band, OCR-style monospace, and the header and payload presented as stamped segments with a machine-readable strip.
+A passport customs page: a navy cover band, OCR-style monospace, and the header and payload presented as stamped segments.
 
 ## Privacy
 

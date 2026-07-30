@@ -95,11 +95,13 @@ textarea:focus{outline:2px solid var(--stamp2);outline-offset:-1px}
   }
   function tsRow(label,obj,key,rows,now){
     if(obj&&typeof obj[key]==="number"){
-      var d=new Date(obj[key]*1000);
+      var ms=obj[key]*1000;
+      var d=new Date(ms);
+      var ok=!isNaN(d.getTime());
       var div=document.createElement("div");
       var cls="crow";
-      var human=d.toLocaleString();
-      if(key==="exp"){cls+=" exp"+(obj[key]*1000>now?" live":"");human+= obj[key]*1000>now?"  (valid)":"  (expired)";}
+      var human=ok?d.toLocaleString():("out of range ("+obj[key]+")");
+      if(key==="exp"&&ok){cls+=" exp"+(ms>now?" live":"");human+= ms>now?"  (not expired)":"  (expired)";}
       div.className=cls;
       div.innerHTML='<span>'+label+'</span><span class="v">'+human+'</span>';
       rows.appendChild(div);
@@ -114,8 +116,10 @@ textarea:focus{outline:2px solid var(--stamp2);outline-offset:-1px}
     var parts=raw.split(".");
     if(parts.length<2){hEl.textContent="not a JWT";pEl.textContent="expected three parts separated by dots";sEl.textContent="Signature: missing.";return;}
     var hTxt,pTxt;
-    try{hTxt=b64urlDecode(parts[0]);}catch(e){hTxt="could not decode header";}
-    try{pTxt=b64urlDecode(parts[1]);}catch(e){pTxt="could not decode payload";}
+    if(parts[0]===""){hTxt="empty header segment";}
+    else{try{hTxt=b64urlDecode(parts[0]);}catch(e){hTxt="could not decode header";}}
+    if(parts[1]===""){pTxt="empty payload segment";}
+    else{try{pTxt=b64urlDecode(parts[1]);}catch(e){pTxt="could not decode payload";}}
     hEl.textContent=pretty(hTxt);pEl.textContent=pretty(pTxt);
     var payloadObj=null;try{payloadObj=JSON.parse(pTxt);}catch(e){}
     if(payloadObj){
@@ -125,7 +129,8 @@ textarea:focus{outline:2px solid var(--stamp2);outline-offset:-1px}
       tsRow("Expires (exp)",payloadObj,"exp",rows,now);
       if(rows.children.length)claimsBox.style.display="";
     }
-    sEl.textContent=parts[2]?("Signature present ("+parts[2].length+" chars). Not verified by this tool."):"Signature: none in this token.";
+    if(parts.length>3){sEl.textContent="This has "+parts.length+" dot-separated parts. A signed JWT has three, so no signature is reported here. A five-part token is an encrypted JWE, and its contents cannot be read without the key.";}
+    else{sEl.textContent=parts[2]?("Signature present ("+parts[2].length+" chars). Not verified by this tool."):"Signature: none in this token.";}
   }
   document.getElementById("jwt").addEventListener("input",run);
   run();
