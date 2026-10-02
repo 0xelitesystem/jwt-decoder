@@ -14,13 +14,35 @@ Decoding is not verification. A token that decodes cleanly is not a trusted one,
 
 A passport customs page: a navy cover band, OCR-style monospace, and the header and payload presented as stamped segments.
 
+## Use
+
+1. Paste a JWT into the box. It decodes as you type.
+2. Read the decoded header and payload JSON.
+3. Check the issued-at, not-before and expiry claims, shown as human dates, and whether the token is expired.
+4. Treat the result as unverified: the signature is never checked.
+
+## Why this exists
+
+Tokens carry user IDs, emails and scopes, so pasting one into a hosted decoder you do not control is a real leak. This is a single HTML file with no tracking and no network calls that only base64url-decodes the token locally, MIT licensed so you can audit and keep it.
+
 ## Privacy
 
 Everything runs in your browser. Nothing you type is sent anywhere, stored, or saved. Closing the tab clears it.
 
-## Use it
+## Run locally
 
 Open `index.html` in any modern browser, or host it as a static page. No build step, no dependencies, no network calls.
+
+```
+git clone https://github.com/0xelitesystem/jwt-decoder
+cd jwt-decoder
+```
+
+Then open `index.html`, or serve the folder with `python -m http.server` and visit http://localhost:8000.
+
+## Build
+
+No build step. The whole tool is one `index.html` with inline CSS and JavaScript and no dependencies.
 
 ## More
 
